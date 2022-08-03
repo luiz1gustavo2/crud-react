@@ -1,23 +1,28 @@
-import logo from './logo.svg';
 import './App.css';
+import {BrowserRouter, Routes, Route} from 'react-router-dom';
+
+import Menu from './components/Menu';
+
+import ViewStudent from './pages/ViewStudent';
+import AddStudent from './pages/AddStudent';
+import EditStudent from './pages/EditStudent';
+
+import axios from 'axios';
+axios.defaults.baseURL = "http://localhost:8000/";
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+        <BrowserRouter>
+
+          <Menu />
+
+          <Routes>
+            <Route path="/students" element={<ViewStudent />} />
+            <Route path="/add-student" element={<AddStudent />} />
+            <Route path="/edit-student/:id" element={<EditStudent />} />
+          </Routes>
+        </BrowserRouter>
     </div>
   );
 }
