@@ -1,42 +1,42 @@
-import React, {useState, useEffect} from 'react';
-import {Link, useNavigate} from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
 function EditStudent(props) {
-
     const navigate = useNavigate();
-    const [loading, setLoading] = useState(true);
     const [studentInput, setStudent] = useState([]);
-    const [errorInput, setError] = useState([]);
+    const { id } = useParams()
 
     useEffect(() => {
-        
-        const student_id = props.match.params.id;
-        axios.get(`/api/edit-student/${student_id}`).then( res => {
-
-            if(res.data.status === 200)
-            {
+        axios.get(`/api/edit-student/${id}`, {
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "Authorization",
+                "Access-Control-Allow-Methods": "GET, POST, OPTIONS, PUT, PATCH, DELETE",
+            }
+        }).then((res) => {
+            if (res.data.status === 200) {
                 setStudent(res.data.student);
-                setLoading(false);
-            }
-            else if(res.data.status === 404)
+                console.log(res.data.student);
+            } else if(res.data.status === 404)
             {
-                navigate('/students');
+                navigate.push('/students');
             }
-        });
+            console.log("dentro do fetch dps do setinput");
+        })
+        console.log("dentro do useeffect dps do fetch");
+    }, [navigate])
 
-    }, [navigate, props.match.params.id]);
+    
 
-    const handleInput = (e) => {
+    const handleChange = (e) => {
         e.persist();
-        setStudent({...studentInput, [e.target.name]: e.target.value });
+        setStudent(({ ...studentInput, [e.target.name]: e.target.value }))
+        console.log("final do handle change");
     }
 
-    const updateStudent = (e) => {
+    const submitForm = (e) => {
         e.preventDefault();
-        
-        const student_id = props.match.params.id;
-        // const data = studentInput;
         const data = {
             name: studentInput.name,
             course: studentInput.course,
@@ -44,28 +44,15 @@ function EditStudent(props) {
             phone: studentInput.phone,
         }
 
-        axios.put(`/api/update-student/${student_id}`, data).then(res=>{
-            if(res.data.status === 200)
-            {
-                setError([]);
-               navigate('/students');
-            }
-            else if(res.data.status === 422)
-            {
-                setError(res.data.validationErrors);
-            }
-            else if(res.data.status === 404)
-            {
-                navigate('/students');
-            }
-        });
-    }
-
-    if(loading)
-    {
-        return <h4>Loading Edit Student Data...</h4>
-    }
+            axios.put(`/api/update-student/${id}`, data).then((res) => {
+                if (res.data.status === 200) {
+                    navigate('/students');
+                }
+            })
+    } 
     
+
+
     return (
         <div>
             <div className="container">
@@ -73,35 +60,31 @@ function EditStudent(props) {
                     <div className="col-md-6">
                         <div className="card">
                             <div className="card-header">
-                                <h4>Edit Students 
+                                <h4>Edit Students
                                     <Link to={'/students'} className="btn btn-danger btn-sm float-end"> BACK</Link>
                                 </h4>
                             </div>
                             <div className="card-body">
-                                
-                                <form onSubmit={updateStudent} >
+
+                                <form>
                                     <div className="form-group mb-3">
                                         <label>Student Name</label>
-                                        <input type="text" name="name" onChange={handleInput} value={studentInput.name} className="form-control" />
-                                        <span className="text-danger">{errorInput.name}</span>
+                                        <input type="text" name="name" onChange={handleChange} value={studentInput.name || ''} className="form-control" />
                                     </div>
                                     <div className="form-group mb-3">
                                         <label>Student Course</label>
-                                        <input type="text" name="course" onChange={handleInput} value={studentInput.course}  className="form-control" />
-                                        <span className="text-danger">{errorInput.course}</span>
+                                        <input type="text" name="course" onChange={handleChange} value={studentInput.course || ''} className="form-control" />
                                     </div>
                                     <div className="form-group mb-3">
                                         <label>Student Email</label>
-                                        <input type="text" name="email" onChange={handleInput} value={studentInput.email}  className="form-control" />
-                                        <span className="text-danger">{errorInput.email}</span>
+                                        <input type="text" name="email" onChange={handleChange} value={studentInput.email || ''} className="form-control" />
                                     </div>
                                     <div className="form-group mb-3">
                                         <label>Student Phone</label>
-                                        <input type="text" name="phone" onChange={handleInput} value={studentInput.phone}  className="form-control" />
-                                        <span className="text-danger">{errorInput.phone}</span>
+                                        <input type="text" name="phone" onChange={handleChange} value={studentInput.phone || ''} className="form-control" />
                                     </div>
                                     <div className="form-group mb-3">
-                                        <button type="submit" id="updatebtn" className="btn btn-primary">Update Student</button>
+                                        <button type="submit" id="updatebtn" onClick={submitForm} className="btn btn-primary">Update Student</button>
                                     </div>
                                 </form>
 

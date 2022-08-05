@@ -1,28 +1,24 @@
 import './App.css';
-import {BrowserRouter, Routes, Route} from 'react-router-dom';
-
 import Menu from './components/Menu';
-
-import ViewStudent from './pages/ViewStudent';
-import AddStudent from './pages/AddStudent';
-import EditStudent from './pages/EditStudent';
-
+import Guest from './components/MenuVisitante';
 import axios from 'axios';
+import AuthUser from './pages/AuthUser';
+
 axios.defaults.baseURL = "http://localhost:8000/";
 
 function App() {
+  const { getToken } = AuthUser();
+  if (!getToken()) {
+    return (
+      <>
+    <Guest />
+      </>
+    );
+  }
   return (
     <div className="App">
-        <BrowserRouter>
+      <Menu />
 
-          <Menu />
-
-          <Routes>
-            <Route path="/students" element={<ViewStudent />} />
-            <Route path="/add-student" element={<AddStudent />} />
-            <Route path="/edit-student/:id" element={<EditStudent />} />
-          </Routes>
-        </BrowserRouter>
     </div>
   );
 }
